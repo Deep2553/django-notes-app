@@ -1,29 +1,38 @@
-@Library('Shared')_
-pipeline{
-    agent { label 'dev-server'}
+pipeline {
+    agent any 
     
     stages{
-        stage("Code clone"){
+        stage("Code"){
             steps{
-                sh "whoami"
-            clone("https://github.com/Deep2553/django-notes-app.git/","main")
+                 echo "Clonig the code"
+                 git url:"https://github.com/Deep2553/django-notes-app.git", branch:"main"
+            }
+           
+        }
+        stage("build"){
+            steps{
+                 echo "Building image"
+                 sh "docker build -t django-project ."
             }
         }
-        stage("Code Build"){
+        
+        stage("Push to Docker Hub"){
             steps{
-            dockerbuild("notes-app","latest")
-            }
-        }
-        stage("Push to DockerHub"){
-            steps{
-                dockerpush("dockerHubCreds","notes-app","latest")
+                 echo "Depoying the container"
+                 
+                 withCredentials([usernamePassword(credentialsId:"dockerhub", passwordVariable:"dockerhubPass", usernameVariable:"dockerhubUser")]){
+                 sh "docker tag django-project ${env.dockerhubUser}/django-project:latest"
+                 sh "docker login -u ${env.dockerhubUser} -p ${env.dockerhubPass}"
+                 sh "docker push ${env.dockerhubUser}/django-project:latest"
+                }
             }
         }
         stage("Deploy"){
             steps{
-                deploy()
+                 echo "Deploy"
+                 sh "docker run -d -p 8000:8000 deep2553/django-project:latest"
             }
+            
         }
-        
-    }
+} 
 }
