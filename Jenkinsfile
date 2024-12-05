@@ -30,7 +30,7 @@ pipeline {
         stage("Deploy"){
             steps{
                  echo "Deploy"
-                 sh "docker run -d -p 8000:8000 deep2553/django-project:latest"
+                 sh "docker-compose down && docker-compose up -d -p 8000:8000"
             }
             
         }
