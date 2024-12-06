@@ -38,14 +38,4 @@ pipeline {
             }
         }
     }
-
-    post {
-        always {
-            echo "Cleaning up Docker resources"
-            sh "docker system prune -f || true"
-        }
-        failure {
-            echo "Pipeline failed. Check logs for details."
-        }
-    }
 }
