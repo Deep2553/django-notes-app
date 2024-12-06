@@ -1,7 +1,7 @@
-services: "3.3"
+version: "3.3"  # This defines the Docker Compose version
+
+services:       # This defines the services section
   web:
     build: .
     ports:
       - "8000:8000"
-  
-  
